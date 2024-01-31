@@ -195,3 +195,8 @@ setup_cron() {
 3 0 */1 * * ? birdc c
 EOF
 }
+
+generate_key() {
+    echo -e "${green}Generating WireGuard key pair${plain}"
+    wg genkey | tee privatekey | wg pubkey > publickey
+}
