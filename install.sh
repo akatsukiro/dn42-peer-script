@@ -199,4 +199,6 @@ EOF
 generate_key() {
     echo -e "${green}Generating WireGuard key pair${plain}"
     wg genkey | tee privatekey | wg pubkey > publickey
+    echo "Your private key is $(cat privatekey)"
+    echo "Your public key is $(cat publickey)"
 }
