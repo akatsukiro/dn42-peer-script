@@ -202,3 +202,34 @@ generate_key() {
     echo "Your private key is $(cat privatekey)"
     echo "Your public key is $(cat publickey)"
 }
+
+setup_tunnel() {
+  echo -e "${green}Setting up WireGuard tunnel${plain}"
+  echo "Please enter neighbor's information"
+  read -p "Neighbor's AS number: " neighbor_as_number
+  read -p "Neighbor's IP address: " neighbor_ip
+  read -p "Neighbor's Listen Port(Default is neighbour's ASN last 5 digits): " neighbor_listen_port
+  if neighbor_listen_port == ""; then
+    neighbor_listen_port = ${neighbor_as_number: -5}
+  fi
+  read -p "Neighbor's Public Key: " neighbor_public_key
+  read -p "Your Listen Port(Default is your ASN last 5 digits): " listen_port
+  read -p "Allowed IPs (Default 10.0.0.0/8, 172.16.0.0/12, fe80::/64, fd00::/8): " allowed_ips
+  if allowed_ips == ""; then
+    allowed_ips = "10.0.0.0/8, 172.16.0.0/12, fe80::/64, fd00::/8"
+  fi
+  private_key=$(cat privatekey)
+
+  cat > /etc/wireguard/dn42-${neighbor_as_number: -5}.conf <<EOF
+[Interface]
+PrivateKey = ${private_key}
+ListenPort = ${listen_port}
+
+[Peer]
+PublicKey = ${neighbor_public_key}
+Endpoint = ${neighbor_ip}:${neighbor_listen_port}
+
+# 限制 IP
+AllowedIPs = allowed_ips
+EOF
+}
